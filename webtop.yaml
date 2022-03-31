@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: webtop-deployment
+  labels:
+    app: webtop
+spec:
+  replicas: 5
+  selector:
+    matchLabels:
+      app: webtop
+  template:
+    metadata:
+      labels:
+        app: webtop
+    spec:
+      containers:
+      - name: webtop
+        image: ghcr.io/andrew-stclair/custom-webtop:latest
+        ports:
+        - containerPort: 3000
+        resources:
+          limits:
+            cpu: 500m
+            memory: 512Mi
+          requests:
+            cpu: 250m
+            memory: 50Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: webtop-service
+spec:
+  selector:
+    app: webtop
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 3000
+      name: http
+  type: LoadBalancer
+  sessionAffinity: ClientIP
